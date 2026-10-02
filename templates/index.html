@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cloud Assistant Chatbot</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- Header -->
+
+    <header class="header">
+
+        <div class="bot-icon">
+            🤖
+        </div>
+
+        <div>
+            <h1>Cloud Assistant</h1>
+            <p>
+                CodeAlpha Task 4 • Online
+            </p>
+        </div>
+
+    </header>
+
+
+    <!-- Chat Area -->
+
+    <main class="chat-container" id="chatContainer">
+
+        <div class="message bot-message">
+
+            <div class="avatar">
+                🤖
+            </div>
+
+            <div class="bubble">
+
+                <strong>Cloud Assistant</strong>
+
+                <p>
+                    Hello! 👋 I'm your Cloud Assistant.
+                    Ask me about CodeAlpha, internships,
+                    cloud computing, Python, Flask, or this project.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- Suggestions -->
+
+    <div class="suggestions">
+
+        <button onclick="sendSuggestion('What is cloud computing?')">
+            ☁️ Cloud Computing
+        </button>
+
+        <button onclick="sendSuggestion('Tell me about CodeAlpha')">
+            💼 CodeAlpha
+        </button>
+
+        <button onclick="sendSuggestion('What is Python?')">
+            🐍 Python
+        </button>
+
+        <button onclick="sendSuggestion('What are the chatbot features?')">
+            ✨ Features
+        </button>
+
+    </div>
+
+
+    <!-- Input Area -->
+
+    <div class="input-area">
+
+        <input
+            type="text"
+            id="messageInput"
+            placeholder="Type your message..."
+            autocomplete="off"
+        >
+
+        <button id="sendButton" onclick="sendMessage()">
+            Send ➤
+        </button>
+
+    </div>
+
+
+    <footer>
+        CodeAlpha Cloud Computing Internship • Task 4
+    </footer>
+
+</div>
+
+
+<script>
+
+const input = document.getElementById("messageInput");
+const chatContainer = document.getElementById("chatContainer");
+
+
+function addMessage(message, type) {
+
+    const messageDiv = document.createElement("div");
+
+    messageDiv.className =
+        type === "user"
+        ? "message user-message"
+        : "message bot-message";
+
+
+    const avatar = document.createElement("div");
+
+    avatar.className = "avatar";
+
+    avatar.textContent =
+        type === "user" ? "👤" : "🤖";
+
+
+    const bubble = document.createElement("div");
+
+    bubble.className = "bubble";
+
+
+    const text = document.createElement("p");
+
+    text.textContent = message;
+
+
+    bubble.appendChild(text);
+
+    messageDiv.appendChild(avatar);
+
+    messageDiv.appendChild(bubble);
+
+    chatContainer.appendChild(messageDiv);
+
+
+    chatContainer.scrollTop =
+        chatContainer.scrollHeight;
+}
+
+
+async function sendMessage() {
+
+    const message =
+        input.value.trim();
+
+
+    if (!message) {
+        return;
+    }
+
+
+    addMessage(message, "user");
+
+    input.value = "";
+
+
+    try {
+
+        const response =
+            await fetch("/chat", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    message: message
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        addMessage(
+            data.response,
+            "bot"
+        );
+
+
+    } catch (error) {
+
+        addMessage(
+            "Sorry, something went wrong. Please try again. 😕",
+            "bot"
+        );
+
+    }
+
+}
+
+
+function sendSuggestion(message) {
+
+    input.value = message;
+
+    sendMessage();
+
+}
+
+
+input.addEventListener(
+    "keypress",
+    function(event) {
+
+        if (event.key === "Enter") {
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
